@@ -82,6 +82,8 @@ async fn init(device: AsyncStreamDeck, serial: String) {
 		Kind::Pedal => 5,
 		Kind::Plus => 7,
 		Kind::Neo => 9,
+                Kind::Akp815 => 0,
+                _ => 2
 	};
 	let _ = device.clear_all_button_images().await;
 	if let Ok(settings) = crate::store::get_settings() {
@@ -138,7 +140,7 @@ pub async fn initialise_devices() {
 	// Iterate through detected Elgato devices and attempt to register them.
 	match elgato_streamdeck::new_hidapi() {
 		Ok(hid) => {
-			for (kind, serial) in elgato_streamdeck::asynchronous::list_devices_async(&hid) {
+			for (kind, serial) in elgato_streamdeck::asynchronous::list_devices_async(&hid, false) {
 				match elgato_streamdeck::AsyncStreamDeck::connect(&hid, kind, &serial) {
 					Ok(device) => {
 						tokio::spawn(init(device, serial));
